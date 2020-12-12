@@ -31,3 +31,19 @@ clf.fit(X_train, Y_train) #training data using perceptron
 
 #Accuracy using Perceptron Model
 clf.score(X,Y)
+
+#Using backpropagation model in Neural Network
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow import keras
+from keras import layers
+#creating model
+model=keras.Sequential(name="Back-Propagation")
+model.add(keras.Input(shape=5,name="input_layer"))
+model.add(layers.Dense(128,activation='sigmoid',name="Hidden1"))
+model.add(layers.Dense(32,activation='sigmoid',name="Hidden2"))
+model.add(layers.Dense(1,activation='sigmoid',name="output"))
+#training model
+model.compile( loss=keras.losses.binary_crossentropy,optimizer='rmsprop', metrics=['accuracy'])
+output=model.fit(X_train,Y_train, epochs=50)

@@ -47,3 +47,93 @@ model.add(layers.Dense(1,activation='sigmoid',name="output"))
 #training model
 model.compile( loss=keras.losses.binary_crossentropy,optimizer='rmsprop', metrics=['accuracy'])
 output=model.fit(X_train,Y_train, epochs=50)
+
+#implementing SVM
+from sklearn import datasets
+from sklearn.metrics import accuracy_score
+from sklearn import svm
+from sklearn import metrics
+
+#training data using linear kernel trick
+clf = svm.SVC(kernel='linear')
+clf = clf.fit(X_train, Y_train)
+o1=clf.predict(X_test)
+accuracy_score(o1,Y_test) #checking accuracy
+
+support_vector_indices = clf.support_
+print(support_vector_indices)  #print the index of all support vectors which will maximise the margin
+
+#implementing SOM using Minisom
+import numpy as np
+dataset=np.array(dataset)
+Z=dataset[:,2:]
+from sklearn.preprocessing import MinMaxScaler
+sc = MinMaxScaler(feature_range = (0,1))
+Z = sc.fit_transform(Z)
+
+from minisom import MiniSom
+som = MiniSom( x = 10, y = 10, input_len = 5, sigma = 1.0, learning_rate = 0.6)
+som.random_weights_init(Z)
+#trainig som model
+som.train_random(data = Z, num_iteration = 100)
+
+#Visualising SOM after training
+from pylab import bone, pcolor, colorbar, plot, show
+bone()
+pcolor(som.distance_map().T)
+colorbar()
+for i, x in enumerate(Z):
+    w = som.winner(x)
+    plot(w[0] + 0.5,
+         w[1] + 0.5,
+         markerfacecolor = 'None',
+         markersize = 10,
+         markeredgewidth = 2)
+show()
+
+#Implementing LVQ
+import numpy as np
+dataset=np.array(dataset)
+X=dataset[:,2:] #data
+Y=dataset[:,1] #target
+lr=0.6 #learning rate parameter
+w1=np.random.ranf(5,) #initialising random weights 
+w2=np.random.ranf(5,)
+#calculate euclidean distance
+def distance(x,w):
+    return(np.sqrt(np.sum((x-w)**2)))
+
+def update_w1(x,w,lr):    # if Target=0
+    return (w+lr*(x-w))
+
+def update_w2(x,w,lr):    #if Target=1
+    return (w-lr*(x-w))
+  
+for i in range(1):
+  print("Iteration: ",i+1)
+  for j in range(249):
+    print("Input:", X[j])
+    print("Target", Y[j])
+    d1=distance(X[j],w1)
+    d2=distance(X[j],w2)
+    if d1<=d2:
+      if Y[j]==0:
+        w1=update_w1(X[j],w1,lr)
+      else:
+        w1=update_w2(X[j],w1,lr)
+    else:
+      if Y[j]==1:
+        w2=update_w1(X[j],w2,lr)
+      else:
+        w2=update_w2(X[j],w2,lr)   
+  lr=lr*0.8
+print("Updated lr:",lr)
+
+#Checking the classification
+Sample = [ 35, 99, 201, 190, 195] 
+dis1=distance(Sample,w1)
+dis2=distance(Sample,w2)
+if(dis1>dis2):
+  print("Sample belongs to Class 1")
+else:
+  print("Sample belongs to Class 2")    
